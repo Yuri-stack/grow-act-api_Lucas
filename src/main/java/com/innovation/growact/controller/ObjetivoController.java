@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.innovation.growact.model.Objetivo;
 import com.innovation.growact.repository.ObjetivoRepository;
+import com.innovation.growact.service.ObjetivoService;
 
 import jakarta.validation.Valid;
 
@@ -31,9 +32,22 @@ public class ObjetivoController {
 	@Autowired
 	private ObjetivoRepository objetivoRepository;
 	
+	@Autowired
+	private ObjetivoService objetivoService;
+	
 	@GetMapping
 	public ResponseEntity<List<Objetivo>> getAll(){
 		return ResponseEntity.ok(objetivoRepository.findAll());
+    }
+	
+	/* Esse método irá buscar todos os objetivos de um usuário
+	 * especifico. Assim quando vc fazer a busca pelos objetivos, 
+	 * basta passar o id do usuário logado para trazer apenas 
+	 * os dados do usuário logado
+	 * */
+	@GetMapping("/usuario/{id}")
+	public ResponseEntity<List<Objetivo>> getAllByUsuario(@PathVariable Long id){
+		return ResponseEntity.ok(objetivoService.buscarObjetivosPorUsuario(id));
     }
 	
 	@GetMapping("/{id}")
@@ -50,7 +64,7 @@ public class ObjetivoController {
     }
 	
     @PutMapping
-    public ResponseEntity<Objetivo> put(@Valid @RequestBody Objetivo objetivo){
+    public ResponseEntity<Objetivo> put(@Valid @RequestBody Objetivo objetivo){ 
     	return objetivoRepository.findById(objetivo.getId())
     			.map(resposta -> ResponseEntity.status(HttpStatus.OK)
     					.body(objetivoRepository.save(resposta)))
